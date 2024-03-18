@@ -11,7 +11,7 @@ import {
   RunnablePassthrough,
 } from "@langchain/core/runnables";
 import document from "./KnowledgeBase.txt";
-
+import gsap from "gsap";
 import "./App.css";
 
 // NOTES
@@ -24,7 +24,7 @@ import "./App.css";
 - Error: Missing value for input:     --- This occurs when the input variables are not defined correctly. Make sure the invoke() and object out (in the runnable sequence) all input variables match the same name as in the prompts.
 
 */ function App() {
-  const [isLoading, setIsLoading] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [convoHistory, setConvoHistory] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
@@ -123,31 +123,103 @@ import "./App.css";
     answerChain,
   ]);
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   // Update conversation history with user input
+  //   const updatedConvoHistory = [...convoHistory, inputValue];
+  //   setConvoHistory(updatedConvoHistory);
+  //   setInputValue("");
+  //   setIsLoading(true); // Set loading state to true
+  //   try {
+  //     const response = await mainChain.invoke({
+  //       question: inputValue,
+  //       convHistory: convoHistory, // Pass updated conversation history
+  //     });
+  //     setIsLoading(false); // Set loading state to false after receiving response
+  //     setConvoHistory([...updatedConvoHistory, response]);
+  //   } catch (error) {
+  //     console.error("Error occurred:", error);
+  //     setIsLoading(false); // Ensure loading state is set to false in case of error
+  //     // Handle error gracefully, e.g., display an error message to the user
+  //   }
+  // };
+
+  useEffect(() => {
+    // Animation for incoming messages
+    gsap.from(".speech", {
+      opacity: 0,
+      y: 20,
+      duration: 0.5,
+      stagger: 0.1,
+      ease: "power3.out",
+    });
+  }, [convoHistory]); // Run the animation whenever convoHistory changes
+
+  useEffect(() => {
+    gsap.from(".chatbot-container", {
+      opacity: 0,
+      y: 50,
+      duration: 1,
+      ease: "power3.out",
+    });
+  }, []);
+
+  const animateTyping = (element, message) => {
+    const chars = message.split("");
+    gsap.fromTo(
+      element,
+      { opacity: 0 },
+      {
+        opacity: 1,
+        duration: 0.5,
+        delay: 0.5,
+        onComplete: () => {
+          chars.forEach((char, index) => {
+            gsap.to(element, {
+              textContent: message.substring(0, index + 1),
+              duration: 0.1,
+              delay: index * 0.1,
+            });
+          });
+        },
+      }
+    );
+  };
+
+  gsap.to(".speech", {
+    scale: 1.05,
+    duration: 0.2,
+    ease: "power1.inOut",
+    stagger: 0.1,
+    // Add an ease-out effect on mouse out
+    onMouseOut: () =>
+      gsap.to(".speech", { scale: 1, duration: 0.2, ease: "power1.inOut" }),
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Update conversation history with user input
     const updatedConvoHistory = [...convoHistory, inputValue];
     setConvoHistory(updatedConvoHistory);
     setInputValue("");
-    setIsLoading(true); // Set loading state to true
+    setIsLoading(true);
+
     try {
       const response = await mainChain.invoke({
         question: inputValue,
-        convHistory: updatedConvoHistory, // Pass updated conversation history
+        convHistory: convoHistory,
       });
-      setIsLoading(false); // Set loading state to false after receiving response
-      setConvoHistory([...updatedConvoHistory, response]);
+
+      setIsLoading(false);
+      animateTyping(".speech:last-child", response); // Call animateTyping with the last chat message
     } catch (error) {
       console.error("Error occurred:", error);
-      setIsLoading(false); // Ensure loading state is set to false in case of error
-      // Handle error gracefully, e.g., display an error message to the user
+      setIsLoading(false);
     }
   };
 
   return (
     <main>
       <section className="chatbot-container">
-        {/* Conversation history */}
         <div className="chatbot-conversation-container">
           {convoHistory.map((msg, index) => (
             <div
@@ -159,7 +231,7 @@ import "./App.css";
               {msg}
             </div>
           ))}
-          {isLoading && <div style={{ color: "white" }}>Loading...</div>}
+          {isLoading && <div>Loading...</div>}
         </div>
         {/* Form for new message */}
         <form className="chatbot-input-container" onSubmit={handleSubmit}>
@@ -181,164 +253,6 @@ import "./App.css";
 
 export default App;
 
-// // Issues / error messages:
+//  Issues / error messages:
 
-// // Too Many Requests  - hence it takes a while to get my answer. so How can I stop this from
-
-// CODE BELOW WORKS TO PERFECTION.
-// import React, { useEffect, useState } from "react";
-// import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-// import { createClient } from "@supabase/supabase-js";
-// import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
-// import { OpenAIEmbeddings } from "@langchain/openai";
-// import { ChatOpenAI } from "@langchain/openai";
-// import { PromptTemplate } from "@langchain/core/prompts";
-// import { StringOutputParser } from "@langchain/core/output_parsers";
-// import {
-//   RunnableSequence,
-//   RunnablePassthrough,
-// } from "@langchain/core/runnables";
-// import document from "./KnowledgeBase.txt";
-
-// import "./App.css";
-
-// function App() {
-//   const [convoHistory, setConvoHistory] = useState([]);
-//   const [inputValue, setInputValue] = useState("");
-
-//   const sbApiKey =
-//     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwbWpmbmRqanN2cHF0d29leW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAwNTgzNzYsImV4cCI6MjAyNTYzNDM3Nn0.s5w7weREkGnUFwZvUgMEDvXeeRmOO2a_IhQkTXssR2o";
-//   const sbUrl = "https://wpmjfndjjsvpqtwoeymu.supabase.co";
-//   const openAIApiKey = "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";
-//   const client = createClient(sbUrl, sbApiKey);
-
-//   useEffect(() => {
-//     const fetchBase = async () => {
-//       try {
-//         const result = await fetch(document);
-//         const text = await result.text();
-//         const splitter = new RecursiveCharacterTextSplitter({
-//           chunkSize: 700,
-//           chunkOverlap: 70,
-//         });
-
-//         const output = await splitter.createDocuments([text]);
-
-//         await SupabaseVectorStore.fromDocuments(
-//           output,
-//           new OpenAIEmbeddings({ openAIApiKey }),
-//           {
-//             client,
-//             tableName: "documents",
-//           }
-//         );
-//       } catch (err) {
-//         console.log(err);
-//       }
-//     };
-
-//     fetchBase();
-//   }, []);
-
-//   const combineDocuments = (docs) => {
-//     return docs.map((doc) => doc.pageContent).join("\n");
-//   };
-
-//   const llm = new ChatOpenAI({ openAIApiKey });
-
-//   const embeddings = new OpenAIEmbeddings({ openAIApiKey });
-
-//   const vectorStore = new SupabaseVectorStore(embeddings, {
-//     client,
-//     tableName: "documents",
-//     queryName: "match_documents",
-//   });
-
-//   const retriever = vectorStore.asRetriever();
-
-//   const questionTemplate = `Given some conversation history (if any) and a question, convert the question to a standalone question.
-//   conversationHistory: {convHistory}
-//   question: {question}
-//   standalone question:`;
-
-//   const questionPrompt = PromptTemplate.fromTemplate(questionTemplate);
-
-//   const questionChain = questionPrompt.pipe(llm).pipe(new StringOutputParser());
-
-//   const answerTemplate = `You are a helpful and enthusiastic support bot who can answer a given question about based on the context provided and the conversation history. Try to find the answer in the context. If the answer is not given in the context, find the answer in the conversation history if possible. If you really don't know the answer, say "I'm sorry, I don't know the answer to that." And direct the questioner to email help@scrimba.com. Don't try to make up an answer. Always speak as if you were chatting to a friend.
-//   context: {context}
-//   conversationHistory: {convHistory}
-//   question: {question}
-//   answer: `;
-
-//   const answerPrompt = PromptTemplate.fromTemplate(answerTemplate);
-
-//   const answerChain = answerPrompt.pipe(llm).pipe(new StringOutputParser());
-
-//   const retrieverChain = RunnableSequence.from([
-//     (prevResult) => prevResult.standaloneQuestion,
-//     retriever,
-//     combineDocuments,
-//   ]);
-
-//   const mainChain = RunnableSequence.from([
-//     {
-//       standaloneQuestion: questionChain,
-//       originalInput: new RunnablePassthrough(),
-//     },
-//     {
-//       context: retrieverChain,
-//       question: ({ originalInput }) => originalInput.question,
-//       convHistory: ({ originalInput }) => originalInput.convHistory,
-//     },
-//     answerChain,
-//   ]);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     await progressConversation();
-//     setInputValue("");
-//   };
-
-//   async function progressConversation() {
-//     const response = await mainChain.invoke({
-//       question: inputValue,
-//       convHistory: convoHistory,
-//     });
-//     const updatedConvoHistory = [...convoHistory, inputValue, response];
-//     setConvoHistory(updatedConvoHistory);
-//   }
-
-//   return (
-//     <main>
-//       <section className="chatbot-container">
-//         <div className="chatbot-conversation-container">
-//           {convoHistory.map((msg, index) => (
-//             <div
-//               key={index}
-//               className={`speech ${
-//                 index % 2 === 0 ? "speech-human" : "speech-ai"
-//               }`}
-//             >
-//               {msg}
-//             </div>
-//           ))}
-//         </div>
-//         <form className="chatbot-input-container" onSubmit={handleSubmit}>
-//           <input
-//             name="user-input"
-//             type="text"
-//             value={inputValue}
-//             onChange={(e) => setInputValue(e.target.value)}
-//             required
-//           />
-//           <button className="submit-btn" type="submit">
-//             CLICK CLAK
-//           </button>
-//         </form>
-//       </section>
-//     </main>
-//   );
-// }
-
-// export default App;
+//  Too Many Requests  - hence it takes a while to get my answer. so How can I stop this from

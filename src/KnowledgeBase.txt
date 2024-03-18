@@ -1,3 +1,284 @@
+context API:
+Context API is a way for a React component to share information with its descendants, no matter how deeply nested they are in the component tree
+How to use it:
+Within the parent component, Create a variable and assign it ‘  React.createContext()   ‘. Naming convention is after the name you follow it with the word context so its easily understandable. This variable is just like in DOM we do variable name = document.createElement. So we use the name as our lead 
+E.g. const themeContext =  React.createContext()
+Inside the parent components ‘return’ code block you create the context tags (as if its a html element). This will wrap around all the components that you want to access the context api data.
+Here you use the variable name.Provider - This is because the variable will be providing these child components with data.
+Inside the opening tag we use ‘value’ keyword to show we are passing these as props. The ‘value’ and here was assign the ‘value’ an object of the items we want to pass down. So again we use JS expression {} along with object {} syntax so we’ll have 2 sets of {}.
+E.g. 
+Return (
+<>
+       <themeContext.provider    value = {  {state Variable}  }>	
+
+	<child1 />
+	<child2 />
+	<child3 />
+       </themeContext.provider>
+</>)
+The powerful thing about context api is that All the components wrapped within the provider element get access to the value( i.e. props) and any subsequent child component and so for. Its like a bloodline, once it's in, it's passed down to all components no matter how deep. 
+
+
+So now that the child components have access to the prop passed from the context, how do we use it?
+You have to use the useContext hook. So in the child component you must import it from react
+Say we have this example from the parent. 
+Const [theme, setTheme] = useState('light');
+return (
+<ThemeContext.Provider value={ { theme, setTheme} }>
+)
+We use useContext in the child component using destructing (similar to useState) i.e.  we insert the object we have imputed in the provider ‘value’ like so 
+Const {theme, setTheme} = useContext(themeContext)
+Now that we have inserted the context to the child, we can use the props ‘theme’ and ‘setTheme’
+
+
+Summary:
+When you use React.createContext(), it returns:
+Provider: A React component that allows components to use context changes.
+Consumer: A React component that USES context changes. In modern React we use the useContext hook instead of Consumer.
+
+Here's a step-by-step breakdown on how to use context API: 
+
+
+// 1) Create Context:
+const themeContext = React.createContext();
+
+
+// 2) Provide Values:
+
+
+const ThemeProvider = ({ children }) => {
+  const [theme, setTheme] = useState('light');
+
+
+  return (
+    <themeContext.Provider value={{ theme, setTheme }}>
+      <childcomp />
+    </themeContext.Provider>
+  );
+};
+
+
+// 3) Consume Values    // Don’t forget to import useContext hook!!
+const ChildComp = () => {
+  const { theme, setTheme } = useContext(themeContext);
+
+
+  return (
+    <div>
+      <p>Current Theme: {theme}</p>
+
+
+
+
+
+How to pass multiple props using context api?
+So in the provider tags, we have value, the value is syntax and must be there. This value represents an object that holds all the props and in JSX syntax with context api we don’t need to give key-value pair, we just input the name of the variables we want to pass as props directly. Similar to destructuring but its not and its only viable in context api.
+
+
+Single values we’d do value={{variable1}} 
+SO the syntax is VALUE={ {variable1, variable2} }
+So instead of returning 1 jsx expression were returning multiple so we have to place them in an object.  
+E.g. 
+const [theme, setTheme] = useState('light');
+return (
+  <ThemeContext.Provider value={{ theme, setTheme }}>
+	{children}
+</ThemeContext.Provider>
+
+Forms and Inputs: 
+
+Handling user inputs:
+
+let Form = () => {
+  const [input, setinput] = useState("");
+
+
+  const handleChange = (e) => {
+    setinput(e.target.value);
+  };
+  return (
+    <>
+      <input type="text" onChange={handleChange} />
+      <h1>input: {input} </h1>
+    </>
+  );
+};
+
+In the input field add onChange event and assign it a function (event handler)
+Define that function using the handle… naming convention
+Give it the event parameter. This event parameter is used to target what the user is inputting so we use e.target.value (i.e. take the value of the input field)
+Since we want to display the users input on the DOM we have to use ‘useState’. 
+We then on the html part insert how we want to display the users input (in this example we used a h1) 
+In the state function() we insert the e.target.value - this is basically saying ‘update the input (state variable) with e.target.value’ and since we’ve linked the state variable to the h1 it will display there. 
+
+
+Forms - step by step guide to controlling inputs:
+
+
+In this example we will have useState;
+const [title, setTitle] = useState(' ')    -- Whenever we're dealing with controlled inputs/forms we assign the state variable a default state of empty string.
+
+
+ In react we want to keep track of user inputs especially when working with forms. And in order to do so we must keep track of the state.
+
+Therefore, we do this by giving input fields a value attribute (value = ), this value represents the contents of the input field. 
+
+Since we want the value to match the state variable so that we can keep track of it and change state we must assign value to the state variable.  i.e. value = {title} This makes it a controlled input.
+
+
+Next, we add an 'onChange' event listener, in this event we add the anonymous function and give it the event parameter (just like if you're writing a vanilla JS event listener function).
+Inside the function code block we call the state function and within the () we update the title (state variable) to e.target.value i.e. onChange={(e) => {setTitle(e.target.value)} }
+
+This will then keep track of the input fields value and if we're to add an 'add' button we can then display user's input onto the DOM.
+
+Here's a breakdown:
+// 1) State Initialization:
+// Initialize a state variable (title) with an initial state of an empty string.
+
+
+const [title, setTitle] = useState('');
+// 2)Input Field Setup:
+<form>
+<input
+  type="text"
+  value={title}
+  onChange={(e) => setTitle(e.target.value)}
+/>
+</form>
+
+Form submission:
+If you want to submit the form, you have to add an ‘onSubmit’ event listener like so:
+const handleSubmit = (e) => {
+  e.preventDefault();
+  settitle(``) // This will reset the input value back to an empty string. otherwise the user input will still contain the previous search as the default.
+}
+  <form onSubmit={handleSubmit}>
+  </form>
+
+How to update the DOM upon form submission (say you want to add another list item on a grocery list)
+make a function called ‘addItem’ with a parameter(so that we can pass the state variable as an argument).
+Within the code block we create a variable to add the new item to the existing array like so  const newArray = [...originalArray, newItem]
+We then call this function with the state variable as an argument onto the ‘onSubmit’ event handler. This will 
+So this will be the full code:
+const GroceryList = () => {
+  const [groceryList, setGroceryList] = useState([]); // Original list items
+  const [title, setTitle] = useState(''); // This is for the new list items we’ll add (i.e. controlled input)
+
+
+  const addNewItemFunction = (item) => {
+    setGroceryList([...groceryList, item]);
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    addNewItemFunction(title);
+    setTitle('');
+  };
+  return (
+    <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <button type="submit">Add Item</button>
+      </form>
+      <ul>
+        {groceryList.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+
+Incorporating local storage so that when the page reloads it doesn’t go back to the default state variable but to the local storage.
+This is done at the very end of your form (i.e. final step, so only do this after you’ve completed everything). 
+Make the state Variable default value  the JSON.parse(localSotrage.getItem(‘....’)
+Add localStorage.setItem(‘groceryList’, JSON.stringify(controlled input state variable) to the function that will add the new item to a new array. 
+const GroceryList = () => {
+  const [groceryList, setGroceryList] = useState((JSON.parse(localStorage.getItem('shoppingList')))); // This makes the data in local storage the default value of the state variable. Therefore, when the user reloads they get the saved list.
+
+
+Whenever you are retrieving data from local storage you must use || [] - this is to prevent an error from ruining the application if there is no item in local storage. Because in your example about its telling use to get shopping list but what if it doesn’t exist
+correct code is JSON.parse(localStorage.getItem('shoppingList' || []))
+  const [title, setTitle] = useState("");
+
+
+  const addNewItemFunction = (item) => {
+    setGroceryList([...groceryList, item]);
+    localStorage.setItem("shoppingList", JSON.stringify(title)); // This adds the controlled input state variable to local storage.
+  };
+
+
+useEffect Hook: 
+Syntax:
+useEffect(() => {}, [])
+Useffect is a callback function used to carry out side-effects.
+
+
+useEffect(callbackFunction, [dependencies])
+callbackFunction is the code that performs the side effect.
+[dependencies] is an optional array that specifies when the useEffect should run based on changes in state.
+
+Purpose of useEffect:
+useEffect is used in React to manage side effects, which are actions that occur outside the normal flow of the application (e.g., data fetching, subscriptions, or cleanup operations).
+
+
+Three Variations of useEffect:
+
+
+Without dependencies: Runs on every render. So if a state changes in the component, this will render the component and thus running useEffect too.
+useEffect(() => {})
+With an empty dependency array: Runs only on mount
+useEffect(() => {}, [])
+With dependencies: Runs when the specified dependencies change.
+useEffect(() => {}, [postCode])
+
+
+Clean-Up Function and Component Lifecycle:
+Clean up function is when we return another function inside the useEffect code block. I.e. after our primary function. 
+syntax 
+Return () => {
+	code block
+}
+When useEffect has a clean-up function, it runs before the component unmounts or before the next useEffect run (in case of dependencies).
+Component Lifecycle Stages:
+Mounting: Component is created and added to the DOM.
+Updating: Component re-renders due to changes in state or props.
+Unmounting: Component is about to be removed from the DOM.
+A common use case is clearing up resources like event listeners, timers, or subscriptions.
+No clean up means if you have a continuous code (timer or fetch) it will continue to process regardless of state change AND if that is coupled with dependency changes (i.e. state change), useEffect is rendered again and you get concurrent things happening
+With clean up function you can prevent side effect codes from continuing when they are not required anymore.
+
+We use a clean up function in times where the user closes a modal, clicks on a different page etc…
+
+Best Practices:
+Focus on using useEffect for side effects things like fetching API, changes to DOM, saving items to local storage and make the items the dependency,, setTimeout setInterval
+
+NEVER set state directly inside useEffect to prevent infinite loops
+
+NEVER use non-primitive data types (arrays, objects, function) as dependency. This is because In JavaScript, variables that hold non-primitive data types (like objects or arrays) actually store a reference to the memory location where that data is stored. 
+Now, when you create a new object or array, even if the contents are the same, it gets stored in a different memory location. As a result, the reference to this new memory location is different from the reference of the previous one.
+In React, when you have a dependency in a hook like useEffect. React checks if the references of those dependencies have changed to determine whether to re-run the effect or memoization. If the reference changes, React assumes the content has changed, even if it looks the same, and triggers a re-render or re-execution of the effect.  THUS CAUSING INFINITE LOOPING
+
+Example of what NOT TO DO!
+ const data = { dataid: 1 };
+
+
+  useEffect(() => {
+    TrackEvent("pageEvent", data);
+  }, [data]);
+
+
+// Infinite loop is created because the dependency is an object, this changes the object location hence causing a re-render and this cycle continues.
+
+
+
+To avoid infinite loops when using non-primitive values as dependencies you need to ensure that you're not creating a new reference to the non-primitive value on each render. Here are some strategies:
+Memoization with useMemo: You can use useMemo to memoize the non-primitive value, ensuring that it only changes when its dependencies change.
+const memoizedData = useMemo(() => ({ dataid: 1 }), []); // Empty dependency array means it won't change
+
+
+
+
+
 Fetch API data using useEffect: 
 useEffect(() => {
  
@@ -123,3 +404,1314 @@ This is a concise way to conditionally render a component in React based on the 
 
 An example when This is used is  when you want to display something based on the fetch API. Whereby you use a state variable and set it to null and based on the fetch api data you use statefunction(fetchAPI DATA) to render the info to the page. However, since fetch is asynchronous it takes time therefore the default value of state variable is rendered. - this can lead to errors/page not loading because you’re rendering ‘null’ therefore we use conditional rendering to tell react that only render if the left argument in && is true.
 So this is typically used with useState.
+
+https://www.youtube.com/watch?v=qtheqr0jgIQ&list=PL4cUxeGkcC9gZD-Tvwfod2gaISzfRiP9d&index=18
+
+https://www.youtube.com/watch?v=4oCVDkb_EIs
+
+
+
+Custom hooks:
+
+Custom hooks are just JavaScript functions that use one or more of the built-in React hooks.
+
+Create a folder called customHooks
+Create file with the name of your custom hook. In this example we will build a useFetch hook so the file will be called useFetch
+create the component 
+Import any hooks you used
+Write the logic inside the component code block
+In the return part of the component code block you remove the JSX and return the things you want i.e. the state variable which you’ll use 
+You must give the component a parameter of ‘URL’ and inside the fetch() () you pass the parameter and inside the dependency you give ‘url’ 
+Then you call this function in the component you want and pass any URL as an argument
+
+For example
+
+^This is what a component would look like but now we want to add that fetch stuff into a useFetch. So we must take the useEffect and state to the customhook file.
+
+
+^ This is the custom useFetch hook.
+As you can see we just added the logic into this useFetch component and gave it a URL parameter. The fetch() now requires a URL parameter therefore whenever we use UseFetch, whatever API we pass it will work as intended.YOU MUST GIVE ‘URL’ AS A DEPENDENCY TOO - THIS WILL ALLOW THE USEEFFECT TO RENDER WITH THE NEW URL. - this example screenshot doesn’t have it but it should.
+
+
+Very important:
+In the ‘return’ value When creating a custom hook, you typically return the items that other components will use. This can include state variables, state functions, or any other datatype needed by those components.. We must first wrap them in an [] or {} - This is vital because it allows for destructing when importing to other components (think of useContext and UseState). In this above example we didn’t wrap them in {} or [] because we're only returning 1 item.
+
+
+
+
+
+
+^ This is what the component looks like now.
+
+In the child component where we use the customhook we have 2 options
+
+If we are returning multiple items from the customHook (we wrap them in {} [] as you already know) then within the child component we do destructuring to give access to those return values and then we can use them as we see fit (similar to useContext)
+
+We return a single value (like the example above). We then store it in a variable and use it. So to clarify in this example we returned ‘response’ and so in the child component we are storing the ‘response’ from the customehook into a variable called ‘data’. Since ‘response’ was an array we can use array methods on ‘data.
+In summary: whatever you return in the customhook, that will be the natural state of it in the child component. Meaning if ‘response’ was a string and not an array then ‘data’ would also be a string and we cant use array methods on it.
+
+
+
+Simple Summary example of customhook and how to use it.:
+
+// Custom Hook
+const useCustomHook = () => {
+  const [count, setCount] = useState(0);
+  const increment = () => setCount(count + 1);
+
+
+  // Return an array
+  return [count, increment];
+
+
+  // Alternatively, return an object
+  // return { count, increment };
+};
+
+
+// Using the Custom Hook in a Component
+const MyComponent = () => {
+  // Destructuring the returned values
+  const [count, increment] = useCustomHook();
+
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+};
+
+
+// count or increment can be any data type. An array or function etc… it doesn't matter. 
+
+
+
+
+
+CRUD Operations: Create Read Update Delete
+
+To understand CRUD you must first understand fetch(). Fetch takes a URL and has an ‘options’ object i.e. fetch(url, {} ). You already know you can add abortcontroller signal here (see clean up function example)
+
+This options object allows you to provide additional configurations and settings for the HTTP request. This is what controls CRUD.
+
+
+Here are some common properties you can include in the options object:
+
+method:
+Specifies the HTTP method of the request (e.g., GET, POST, PUT, DELETE).
+Default value is "GET".
+
+fetch('https://api.example.com/data', {
+  method: 'POST',
+});
+
+
+headers:
+An object representing the headers of the request. You can set custom headers like content type, 
+fetch('https://api.example.com/data', {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Body:
+
+
+The body property represents the data that you want to send with a POST. The data can be in various formats, and the way you structure the body depends on the content type you specify in the headers. In the example below we are sending application/json therefore we must use json.stringify.
+fetch('https://api.example.com/data', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ key: 'value' }) // sends an object
+
+
+  OR 
+
+
+  body: JSON.stringify(newItem) // Sends newItem variable
+
+
+});
+
+
+
+
+
+Remember to set the appropriate Content-Type header based on the type of data you're sending in the body. This helps the server understand how to interpret the data. 
+
+
+
+Now that we know about the options object we can move on to how we can do CRUD operations;
+
+
+Create a component called apiRequest - This will the function in which we pass arguments in order to carry out the fetch request and apply the CRUD methods
+
+const apiRequest = async (url = '', optionsObject = null, errMsg = null) => {
+  try {
+    const response = await fetch(url, {optionsObject});
+    if (!response.ok) throw new Error(`Something went wrong, reload the page`);
+  } catch (error) {
+    errMsg = error.message
+  }
+};
+
+
+Next, in the child component you will have functions for Create, update and delete. (Which will update the local storage or database e.g. db.json server).
+You must wrap your CRUD operation functions with ‘async’ and when you come to call the apiRequest() with arguments you must use await.
+
+This is because 
+ApiRequest is the asynchronous function (as declared in the apiRquest component) therefore it returns the fetch promise. So this function will wait until the promise inside it has been resolved.
+Since Apirequest will ‘hold’ until the promise is fulfilled, that means we can’t call it immediately otherwise the promise within it won’t execute. Therefore in the CRUD function we use ‘await apiRequest()’ to signal that we are waiting for the apirequest to complete its promise before moving on.
+Since we’re ‘awaiting’ we must label that crud operation function with ‘async’ 
+
+
+apiRequest is async:
+Your apiRequest function is marked as async because it performs asynchronous operations, specifically the fetch call.
+The async keyword in the function declaration indicates that the function will return a Promise.
+await apiRequest(...):
+When you call apiRequest in another function (e.g., a CRUD operation function), you use await before it.
+The await keyword is used to pause the execution of the current function until the Promise returned by apiRequest resolves.
+
+
+
+
+
+Note: We don’t need to data = response.json() because we already have a fetchHook for that. We’re just dealing with the response aspect of the API by adding to it, deleting it or creating it.
+
+
+Complete example:
+
+const createResource = async () => {
+  let URL = "https://api.example.com/resources";
+
+
+  let createPost = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newData),
+  };
+  const result = await apiRequest(URL, { createPost });
+};
+
+
+^ In this example we placed the options object in a variable to make the calling of apiRequest clean
+
+
+
+
+
+
+NOTE: THIS IS DIFFERENT TO USEFETCH() CUSTOM HOOK. THIS IS FOR CRUD OPERATIONS CREATE, UPDATE AND DELETE BUT USEFETCH HOOK IS FOR READ
+
+
+
+React Routing
+
+Basics:
+
+Intall npm react-router-dom
+Import BrowserRouter from react-router-dom to the main.jsx file (i.e. file that will render to html (i.e. the one with react.strictmode))
+Inside the react.strictmode you wrap the root component (usually app.jsx) with <BrowserRouter> </BrowserRouter>.  sidenote:The browserRouter acts like a useContext which then passes all the router properties to the app and its children 
+Now, we go into the root element. And we must import ‘Routes’ and ‘Route’ from react-router-dom.
+We add <Routes> <Routes/> and this will wrap around <route /> .(note how route is self closing.
+Routes is to highlight that inside this element is a route. And for each page we want we must put it in <route/> tag.
+Within the <route/> we pass it two props 1) path and 2) element. The path is the url path so if you want a home page the path will be path=’/’ if you want a contact page the path will be path=’/contact’. - basically the path is what gets added to the end of the url. When we use / it’ll just be the homepage.
+The element is where we place the component we want displayed on that path e.g. element={<contact />} this will display the contact component. 
+
+E.g. 
+const App = () => {
+  return (
+    <Routes>
+
+
+        <Route path='/' element={<HomePage />}/>
+        <Route path='/About' element={<About />}/>
+        <Route path='/Contact' element={<Contact />}/>
+
+
+    </Routes>
+  )}
+
+So now whenever the user clicks on homepage/about/contact button on the site it will take them to a ‘new’ page that will display only that component. So this web app will have 3 pages.
+
+If you want components to appear on all pages then you’d add them outside the ‘routes’ tag. 
+E.g. the navbar will be present on all 3 pages because its not specified as a route.
+ <>
+      <header>
+        <Navbar />
+      </header>
+      <main>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/About" element={<About />} />
+          <Route path="/Contact" element={<Contact />} />
+        </Routes>
+      </main>
+    </>
+Now, we’ve connected the router and paths now we just need to add links to those pages
+In normal HTML we use anchor tags with a href attribute however with react we use <Link> </Link> and inside the opening tag we have a ‘to’ attribute which we will assign the same value as we did for path. But again we must import Link from react-router-dom
+
+E.g. 
+   
+      <li>
+        <Link to="/">Home</Link>
+      </li>
+      <li>
+        <Link to="/About">About</Link>
+      </li>
+      <li>
+        <Link to="/Contact">Contact</Link>
+      </li>
+
+This is all great however, if we’re making a navbar we want it so that which page the user clicks on, the navbar name is highlighted to showcase which part of the page the user is on. By using <LINK> this won’t be possible. Therefore, we just simply replace link with NavLink. The only difference between the two is that when using navlink whichever link that we click on it gives it a class of ‘active’. We can then go into CSS and style the navlink via a.active { color: red } - this will color the currently active link with red. REMEMBER TO IMPORT NavLink
+
+Personally I should be using ‘NavLink’ over Link. they’re both the same but if I want to customize it then I can.
+
+404 error page/page not found:
+
+Make a component and include the stuff that it should say on an error page. (for good UX include a button that will send the user to the homepage) 
+
+The * in the path basically means if the user goes on a URL that doesn’t have any of the specified paths we have in our code then display the error component.
+E.g. 
+
+<Route path="*" element={<PageNotFound />} />
+
+
+Route parameters:
+
+Sometimes you may have a parent path that will be home to sub paths. E.g. I have a ‘products’ page and in this page I have 10 different products. I cant give each product the ‘products’ because it will overwrite the initial products page showcasing all the 10 products.
+Therefore i must give them their own subclass of the products page i.e.
+                  <NavLink  to=’ /products/1 ‘ > </NavLink>
+      <NavLink   to=’ /products/2 ‘ > </NavLink>
+                  <NavLink   to=’ /products/3 ‘ > </NavLink>
+The subclasses are called route parameters
+
+So we’ve created the links to those sub paths. Now we need to integrate the route to the sub path and we do this in the root component as follows
+
+          <Route path='/products' element={<Products/>} />
+          <Route path='/products/:id' element={<SingleProduct/>} />
+^ This code is saying we have a path to the products page. Inside the products page we have other links. When you click on the link on the products page and as long as the link has the products path and subpath (e.g. to=’/products/123’) it render the singleproduct component
+
+
+<Route path=’/products/:id’ />   – the :id IS THE SYNTAX FOR route parameters. It's telling the browser that there will be pages that will have extra content added to the end of their path and when its detected then render the singleProduct component. – id can be anything in the url (above we used numbers 1,2,3) but the user can type anything there and it may lead to problems and there is a fix to this which will be discussed later.
+
+
+So far whenever a user clicks on one of the 3 product links it will render the SingleProduct component. But they’re all the same page - what now? We need to associate the route parameter to each of the products.
+In order to use this we must import a hook called useParams() inside the singleProduct component.
+UseParams will contain the route parameter within an object so when we import it we must use object destructuring to access it, for example 
+
+Const { id } = useParams()  – The reason we use ‘id’ is because thats the name we used in the root component in the path section (/products/:id. So if we named it something else we’d put that name in the object because that's the name of the key we’re accessing. 
+We can do anything with this ID now, add it to the h1 etc etc
+
+We can use this ‘id’ to fetch data from the backend to display the correct information based on the id – this is something more advanced and for a later time.
+
+
+
+
+
+Nested routes:
+
+https://www.youtube.com/watch?v=WNScOybyOhg&list=PLC3y8-rFHvwjkxt8TOteFdT_YmzwpBlrG&index=8  - This vid explains nested routes to perfection
+
+The purpose of nested routes is that only certain parts of the UI get re-rendered once a link is clicked.
+
+^ As you can see here, when the user clicks on products it will display the products component which contains links to featured and new. When the user clicks on featured, the URL goes to products/featured but as you can see we will have part of the initial products component displayed - this is achieved through nested routes.
+
+Step by step to make nested routes:
+
+Create a parent page i.e products. Within the products component you add links to the other pages you want. This time though we don’t need to specify the parent path. I.e. above we were dealing with un-nested routes hence we had to use the full path (to /products/1) but with nested routes since the links are present in the parent path we bypass the parent path and go straight to the sub path i.e. 
+<NavLink to=’/featured’ > Featured Items <NavLink>
+<NavLink to=’/New’ > New Items <NavLink>
+
+Now we need to configure the nested routes inside the root component
+
+You know how each route is self closing tag, with nested routes we need that to be a full tag with its own opening and closing tag. Within that element we will add the nested component paths. Like so:
+
+   <Route path="/products" element={<Products />}>
+       <Route path="products/featured" element={<FeaturedProduct />} />
+       <Route path="products/New" element={<NewProduct />} />
+   </Route>
+       
+^here we need to specify the parent path because we’re already within its range. nested routes must provide a complete path starting from the root. So, even though you have a nested route within the /products route, you still need to include the full path, including the parent route's path, for the nested route.
+
+Now all these routes are configured - the parent path doesn’t know where to render the child paths to. So to solve this we use the ‘Outlet’ feature of react.
+
+So we go into the parent path (i.e. products component) and import outlet from react router dom. 
+You then add this Outlet tag at the bottom of your parent path page - This way whatever is above this Outlet tag will be replicated inside the child routes. (THIS IS VERY GOOD FOR UX) And so this will display the important stuff you need from the parent path and then below it render the contents of the child component. So this is how the Parent path component will look like:
+
+import { Link, Outlet } from 'react-router-dom';
+
+
+const Products = () => {
+  return (
+    <>
+      <form action="">
+        <input type="search" placeholder="Search Item" />
+      </form>
+
+
+      <nav>
+        <Link to='/featured'>Featured </Link>     //Again you may need to use absolute path if this shorthand doesn't work
+        <Link to='/new'>new </Link>
+      </nav>
+      <Outlet />   // IMPORTANT ASPECT
+    </>
+  );
+};
+
+
+Index route:
+
+This is connected to nested routes and so can only be used when theres nested routes. Whereby when you have a component that you want to be displayed on the parent paths page then the way to do this is using index route. 
+For example we have a products page but we want to display the featured products on the parent product component (the user can still click featured and new but the featured component will also be displayed on the product page without the need of going to the .featured url. If we click on featured it will still go to the correct url and display what is supposed to be displayed.
+
+On the root component (app.jsx) within the nested route, you must add a new route and instead of giving it  path=... you give it an index attribute. Then you specify the component you want to be displayed via the element attribute. 
+For example:
+
+   <Route path="/products" element={<Products />}>
+            <Route index element={<FeaturedProduct />} />
+            <Route path="/featured" element={<FeaturedProduct />} />
+            <Route path="/New" element={<NewProduct />} />
+   </Route>
+
+Query String/Search Params:
+Sometimes we may need to create filters e.g. sort by name, active users, prices etc… or when a user clicks on a video we want a specific url for that (look at the url of a youtube video it uses searchParams).
+To do this we must use the hook called useSearchParams(). This hook is very similar to useState syntax
+
+Const [searchParams, useSearchParams] = useSearchParams()
+
+Searchparams is an object and useSearchParams is a function which sets the key-value pair of that object. - Again very similar to useState.
+The only difference is that when we come to assign values to the searchparams object via the setSearchParams we must use an object literal and inside the object literal we will use key:value pair. This keyvalue pair is what will be the query string in the URL 
+E.g. setSearchParams( {filter: ‘ActiveUsers’} )
+Now that is in place we can use searchParams value to display any jsx or component we want via conditional rendering. Since SearchParams is an object the way we can obtain the key is via the get method. So we’ll need to create a variable
+ e.g. showActiveUsers = searchParams.get(‘filter’)
+showActiveUsers === ‘‘ActiveUsers’ ? <h2>Showing Active Users</h2> : <h2>Showing all users</h2> 
+
+
+
+Why get method? – The URLSearchParams object returned by useSearchParams is designed to work similarly to the native URLSearchParams API in JavaScript. When you want to retrieve a specific parameter value, you should use the get method.
+
+For example:
+In this example I will be using a button to change the query string (note in different projects you might have something else that will invoke the setSearchParams function.
+
+const Products = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const showActiveUser = searchParams.get('filter');
+ 
+    return (
+      <>
+        <button onClick={() => { setSearchParams({ filter: "ActiveUsers" }); }}> Active users </button>
+        { showActiveUser === 'ActiveUsers' ? <ActiveUser Component /> : <AllUser Component /> }
+      </>
+
+So when we click on the button the url will change to /products?filter=ActiveUsers
+
+summary = You write this inside the page that will have the filter options 
+
+
+Navigating Programmatically
+
+So far we’ve learnt about the user clicking on the links/navlinks but too many links to click can be poor UX. so sometimes we programmatically navigate to a page e.g. in amazon when I click on ‘Submit Order’ button - it takes me to a Order confirmation page. Or if I want to click  a button that takes me back to the homepage (i.e. if the button is on the 404 page).
+To navigate in this way we must use the useNavigate() hook. useNaviagte is a function.
+You simply assign it to a variable. Then on the button you would use an onclick event and inside that function you’d invoke the navigate() just like we’d do with any function. And we pass it the route path we want it to go to  as the parameter
+E.g. 
+ <Route path='order-summary' element={<orderSummary/>} />
+// THIS IS WHAT IS IN APP.JS(root component)
+
+  // This is what you do on the relevant component where you want the button to appear. So in this example this would be our order component which has the button to submit the order
+  const navigate = useNavigate()
+<>
+ <button onClick={() => {navigate('order-summary')}}>Submit Order</button>
+</>
+
+Tip:
+If you want to create a go back button that will take the user to the previous page then you simply pass -1 as the parameter for the navigate function. There's no need to make a route in the root component for this back option..
+<button onClick={() => {navigate(-1) }>Go back</button>
+
+Summary:
+
+UseParams
+Const { id } = useParams()
+useSearchParams
+Const [searchParams, setSearchParams] = useSearchParams()
+useNavigate
+Const navigate = useNavigate()
+outlet
+<outlet />
+
+
+Dynamically creating routes using your own JSON server:
+Creating your JSON server: create a json file and add the data you want it to include.
+Import the json data to your app.jsx and pass it as props to your components
+Now depending on whether your JSON data was an object of objects then when you come to use in in your component you will have to convert it into an array as JSX DOES NOT RENDER OBJECTS.
+If your data is an object of objects ie. object = {  product 1: {title:P1 price: 10}, Product 2: {title:P2 price: 5} } you will need to use Object.keys(nameOfObject) - this will convert the object keys into an array
+We can then use array methods e.g. map() and and use the map parameter to access the name of the keys. We can use this for targeting the inner objects via square notation
+E.g.  Object.keys(nameOfObject).map( (value) => { <h1>nameOfObject[value].title </h1>} – this code is saying, take the object turn its keys into an array and then map over the array and pass the array index value as [] notation and then find the title. 
+Here is where you dynamically create URLs whilst you’re mapping over the keys. You simply do 
+<NavLink to={`productGallery/product/${value}`}  – this will create a new url for each object key.
+Then in the single product component you utilize useParams() as follows:
+if (nameOfObject[id]) { const {object destructuring….} = nameofObject[id] }
+– this line of code is saying, ‘if NameOfObject[URL endpoint] if its truthy i.e. it exists then execute this code. 
+Here you can use else statement to move the user to 404 page not found page.
+
+Summary: 
+- You pass the JSON data as props to all the children that will use it i.e. the parent route and the child route. 
+- The main aspects here is that we must extract the keys as values and then use that key to generate the dynamic url endpoints and also use that value to access the inner objects so that we can select the data within them.
+
+
+React best practices:
+Folders are written in small case letters but component file names are written with a capital letter. E.g. components -> Posts.jsx or Card.jsx, or navbar.jsx
+All file extensions are jsx
+All components must be stored in the components folder that YOU create manually 
+
+
+
+
+React tips and tricks:
+
+
+You can create components in 2 seconds with the name of the component file already incorporated to the function as well as the import and export stuff done for you.
+
+Simply write ‘   rafce ‘’  - this stands for react arow function component with export. It will look like this 
+
+import React from "react";
+
+
+const Card = () => {
+  return <div>Card</div>;
+};
+
+
+export default Card;
+
+
+
+—-------------------------------------------------------------------------------------------------------------
+
+useState() is asynchronous, this means if you were to change the state of a variable, it will 1st register its original state and then the new state. I.e. let [count setCount] = useState(0). If we were to do setCount(count + 1) and console log count. We will get 0 because react takes time to render the state change therefore react returns the console.log before the render has been confirmed hence it shows 0 and not 1.
+
+—-------------------------------------------------------------------------------------------------------------
+When adding attributes to jsx always put them on their own line - this is for readability purposes. 
+
+—-------------------------------------------------------------------------------------------------------------
+
+
+
+In a ternary operator, both the true and false branches can have only one expression each. However, you can use parentheses to group multiple expressions into a single expression. This is useful when you want to return or execute multiple statements based on the condition.
+
+Here's a simple example:
+
+const x = 10;
+
+const result = x === 10 ? (
+  // This is the true branch with multiple JSX elements
+  <>
+    <h1>X is true</h1>
+    <p>Additional text</p>
+  </>
+) : (
+  // This is the false branch with a single JSX element
+  <p>X is not true</p>
+);
+
+This trick is useful for when you want jsx elements to show/hide depending on how many things are present. E.g. you have a shopping list, so you do {items.length} ? list your js items like above : list your jsx items like above.  – This is saying as long as the shopping list has 1 or more items then do this with the list items. If its 0 (ie. false) then do this. 
+
+
+—-------------------------------------------------------------------------------------------------------------
+
+VERY IMPORTANT TIP Regarding useState
+
+In useState we can refer the previous value of the stateVariable using the ‘prev’ key word. To use this we must add a callback function to the stateFunction e.g.
+
+Const [theme, setTheme] = useState(‘light mode’)
+setTheme( (prevTheme) => { prevTheme === ‘light mode’ ? ‘dark’ : ‘light mode’
+
+setCount((prevCount) => prevCount + 1)
+
+Using the functional form: This form takes the previous state (prevCount) as an argument in a function, ensuring that you are working with the latest state at the time of the update. It's the recommended approach for reliable state updates.
+ Using count + 1: This form assumes that the next state depends on the current state (count). However, React doesn't guarantee that the state is updated immediately, so if you have multiple updates in a row, they might not reflect the latest state.
+
+
+—-------------------------------------------------------------------------------------------------------------
+
+
+
+when you want to apply inline styles dynamically based on a condition, you use the style attribute in JSX. e.g.
+
+<li style={{ textDecoration: condition ? 'underline' : 'none' }}>
+
+
+<li style={{ color: condition ? 'red' : 'black' }}>
+
+
+
+Basically you insert the CSS property and then you write the condition. You must add the quotation marks - Note this is slightly different syntax to inline stying in react because we are using a conditional statement.
+
+—-------------------------------------------------------------------------------------------------------------
+
+Validation for empty input field being submitted by the following:
+
+Add ‘required’ attribute to the input field. This makes it so that the user can never submit an empty input 
+—-------------------------------------------------------------------------------------------------------------
+
+https://www.youtube.com/shorts/utNA7xkvmmU
+
+This video explains that if you want an animation effect to take place on every re-render/state change you must add a key to that element. That key should be assigned the state variable. Therefore when we change the state it changes the key hence making react see this as a new element this triggering the animation effect
+
+
+
+
+
+
+Creating loading screen:
+
+
+In order to render things on the dom for the user you must use useState. Since we are planning to render a loading message you’ll do something like this
+Const [loading setloading] = useState(false)
+{loading && <div>Please Hold</div>}
+
+As long as its false, the loading message won’t appear. Therefore if you are fetching an api you can display this loading screen by changing the state to true i.e. setloading(true) inside the fetch function and back to setloading(false) after the data has been retrieved. 
+
+ filter method and deleting items:
+
+In order to delete an item you must add a click event to the delete button and pass it an argument using the .map method (how we pass item.id in the grocery list in a section earlier) 
+We then write the code for that function in the parent app and give it a parameter (which will be the item.id). In here you create a new variable and use .filter method to filter out the deleted item and then you assign the state function the new variable you just created to update the dom.
+
+E.g. 
+handleDelete = (id) => {
+Newarray = data.filter(() => item.id !== id)
+stateFunction(newArray)
+}
+
+In this function the ‘id’ is received from the map() method that passes item.id to the function argument e.g.
+<button onClick(() => {handleClick(item.id)}> when we do map method this will pass item.id to the click function whenever the user click thats function.
+
+
+
+You’re going to be dealing with objects alot. In JSX you cant display object so if you’re looking to display an object you will have to convert it into a string use JSON.stringify(object name)
+
+Or You’ll have to convert the key-value pair into an array via the object.entries() method.
+Object.entries() method converts an object into an array with nested arrays containing the key-value pair in each nest.
+
+
+
+
+ Handling multiple inputs using one onChange event handler:
+1) UseState and give the default value of an object containing the name of the input fields you have and give them a property of empty string e.g. 
+ const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    telephone: ''
+  });
+
+2) inside the input field we must give each input a value (to make it a controlled input), an onchange event and name attribute. The name attribute must correspond with the same name in the object in the state variable. E.g. 
+   <input
+          value={formData.name}
+          name="name"
+          onChange={handleInputChange}
+          type="text"
+        />
+        <input
+          value={formData.email}
+          name="email"
+          onChange={handleInputChange}
+          type="text"
+        />
+
+
+// See name as a data attribute
+// in the input the value is selecting the statevaribale.name of key we want. This is very simple, dont over complicate it.
+
+3) We then start writing the handleChange function. Here we will add 2 variables 
+Name = e.target.name  – this will get the name attribute of your input
+Value = e.target.value  – this will be the value written inside that input
+
+statefunction(
+…statevrarible // here you spread the default state variable
+[name]: value     – this [] notation will select the key inside the object with the corresponding ‘name’ based on the name variable we gave above.
+The value is the e.target.value variable.
+)
+
+Full example:
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    telephone: "",
+  });
+
+
+  const handleInputChange = (event) => {
+    // Getting the value and name of the input which triggered the change
+    const value = event.target.value;
+    const name = event.target.name;
+
+
+    // Updating the input's state
+    setFormData({
+      ...formData,
+      [name]: value,  // very important for all this to work
+    });
+  };
+
+
+
+
+
+
+
+
+  // Notice how each input has a `value`, `name`, and `onChange` prop
+  return (
+    <>
+      <form className="form">
+        <input
+          value={formData.name}
+          name="name"
+          onChange={handleInputChange}
+          type="text"
+        />
+        <input
+          value={formData.email}
+          name="email"
+          onChange={handleInputChange}
+          type="text"
+        />
+
+
+To clear the input fields using setInfo, you should use an object with the updated values for each field. Your approach with:
+
+
+setInfo({    
+  userName: "",
+  email: "",
+  textarea: "",     // This code codes on the onSubmit event handler to reset the form after submission
+ });
+
+
+is correct and recommended because it maintains the structure of your state and explicitly sets each field to an empty string.
+If you use setInfo(''), it would be incorrect because it's setting the entire state to an empty string, which is not the expected structure for your info state.
+
+
+
+
+
+
+
+ In your useFetch hook you could add a state to display loading message. 
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch(url);
+        const jsonData = await response.json();
+        setData(jsonData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [url]);
+
+  return { data, loading };
+}
+
+This is another useFetch hook - it has the loading aspect. So when the fetch has completed the loading state will change to false to stop it from showing. 
+Now you combine this with having the load state to true when fetching begins and not true all the time.
+
+
+ Optional chaining:
+
+The optional chaining (?.) operator accesses an object's property or calls a function. If the object accessed or function called using this operator is undefined or null, the expression short circuits and evaluates to undefined instead of throwing an error
+
+
+const person = {
+  name: 'John',
+  address: {
+    city: 'New York',
+    zipcode: '10001',
+  },
+};
+
+
+// Using optional chaining to access nested properties
+const city = person?.address?.city; // 'New York'
+const country = person?.address?.country; // undefined
+
+
+// Using optional chaining with a function
+const greet = person?.greet?.(); // undefined (if greet is not a function)
+
+
+// Combining optional chaining with nullish coalescing operator (??)
+const defaultCity = person?.address?.city ?? 'Unknown City'; // 'New York'
+const defaultCountry = person?.address?.country ?? 'Unknown Country'; // 'Unknown Country'
+
+
+Option chaining is very useful especially when API fetching. When fetching data from an API, you may encounter different structures or missing properties in responses. Optional chaining allows you to gracefully handle these situations, preventing unexpected errors.Without it then our app will break because it will throw an ‘error that something is undefined’
+
+
+
+Questions:
+
+
+Question: React router: Say I’ve got a page whereby there will be 100 products. With react routing dynamic routes how can I dynamically create viable urls that lead to a product page? Because what if the user inputs a random url endpoint, will that put them through the path created using route parameter?
+So initially the question is how do I dynamically create url’s using the route parameters whilst also preventing the user from going to a URL endpoint I haven’t specified?
+
+I know we use <route path=’ * ‘ element={<PageNotFound />}> to direct the user to the page not found component if they go to a URL not specified. But since we’re using <route path=‘/products/:id’ > which takes any endpoint how do we differentiate between a completely wrong endpoint (hence display the PagenotFound component) and a product end point?
+
+ANSWER: to be answered!
+
+
+
+
+
+const [items, setItems] = useState([
+    { id: 1, label: 'Brazils', checked: false },
+    { id: 2, label: 'Almonds', checked: false },
+    { id: 3, label: 'Coconut', checked: false },
+  ]);
+
+
+  const handleCheckbox = (id) => {
+      let newArray = items.map((item) => {
+        return item.id === id ? { ...item, checked: !item.checked } : item
+      })
+
+
+      setItems(newArray)
+    ;
+  };
+
+
+  return (
+    <div>
+      <h2>Checkbox List</h2>
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={item.checked}
+                onChange={() => handleCheckbox(item.id)}
+              />
+              {item.label}
+            </label>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+How does item.id in the onchange input field know which Item I am referring to?
+Basically when we use map, we are assigning values. 
+So in this example, each list item is created and it uses the current iteration item’s value as a reference. So in the background this is how it looks if were to focus on ALMONDS
+
+Answer:
+<li key={2}>
+            <label>
+              <input
+                type="checkbox"
+                checked={false }
+                onChange={() => handleCheckbox(2)}
+              />
+              {item.label}
+            </label>
+          </li>
+
+Thats what the list item looks like after the map function has completed/behind the scenes. Therefore when a user clicks on a list Item it automatically fires the event handler with the number already present inside it. 
+
+
+Question:
+
+Error: Too many re-renders. React limits the number of renders to prevent an infinite loop.
+
+import React from "react";
+
+
+const Content = ({ backgroundColor, setbackgroundColor, color }) => {
+  const changeBG = (newColor) => {
+    return setbackgroundColor(newColor);
+  };
+
+
+  changeBG(color);
+
+
+  return (
+    <>
+      <div
+        className="mainDiv"
+        style={{
+          border: "2px solid red",
+          width: "30%",
+          height: "200px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: changeBG(),
+        }}
+      ></div>
+    </>
+  );
+};
+
+
+export default Content;
+import React from "react";
+
+
+import { useState } from "react";
+import CreateTodo from "./components/CreateTodo";
+import Content from "./components/Content";
+import "./index.css";
+
+
+function App() {
+  // input field
+  const [color, setcolor] = useState("");
+
+
+  // Div background color
+
+
+  const [backgroundColor, setbackgroundColor] = useState("");
+  return (
+    <>
+      <Content
+        backgroundColor={backgroundColor}
+        setbackgroundColor={setbackgroundColor}
+        color={color}
+      />
+      <CreateTodo color={color} setcolor={setcolor} />
+      <input type="text" />
+    </>
+  );
+}
+
+
+export default App;
+
+
+^ This is the code. Why is this happening and how do I fix
+
+Answer: https://alexsidorenko.com/blog/react-infinite-loop/
+
+3 ways to cause an infinite loop in React
+Have you spent some time trying to debug an infinite loop in React? Maybe you hung your browser a couple of times in the process. Or had one of these 👇
+Uncaught Error: Too many re-renders.
+React limits the number of renders
+to prevent an infinite loop.
+Here are 3 potential causes of the infinite loop in React.
+I. Updating the state inside the render
+function App() {
+  const [count, setCount] = useState(0);
+
+  setCount(1); // infinite loop
+
+  return ...
+}
+If you update the state directly inside your render method or a body of a functional component, it will cause an infinite loop.
+State updates → triggers re-render → state updates → triggers re-render → …
+Fix 🎉
+
+Use conditionals/event listeners or useffect instead of writing out in the open within the component main body.
+
+II. Infinite loop in useEffect
+function App() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    setCount(count + 1) // infinite loop
+  }, [count])
+
+  return ...
+}
+Here's a breakdown of what happens:
+The component mounts, and useEffect runs after the initial render.
+Inside the useEffect, setCount is called, updating the state variable count.
+The state update triggers a re-render of the component.
+After the re-render, the component mounts again, and useEffect runs again because of the dependency on count in the dependency array.
+This process repeats, creating a loop.
+This would indeed cause an infinite loop. The useEffect hook would run every time the count state changes, and since you're modifying count within the effect, it would trigger the effect again, leading to an infinite loop.
+
+
+Fix 🎉
+
+function App() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    setCount(previousCount => previousCount + 1)
+  }, [])
+
+  return ...
+}
+This would NOT cause infinite loop because we’re only changing the state once (on mount) if we were to add the count as a dependency then it will infinite loop
+
+
+
+How to spot infinite loops
+Every time you update a state, picture the sequence of events that will happen after the update. If without additional user interaction, this sequence leads you back to the same state update, you probably have an infinite loop.
+
+Spotting and avoiding infinite Re-renders with usestate:
+
+
+
+1) How re-rendering works with useState:
+In React, a component re-renders when its state or props change. The useState hook allows you to create state variables. When you call setCount(newValue), it triggers a re-render with the updated state.
+function MyComponent() {
+  const [count, setCount] = useState(0);
+
+
+  // Any time setCount is called, it triggers a re-render
+  // which might happen in response to user interactions or other events.
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
+}
+
+2) How to tell if something will re-render infinitely:
+An infinite loop happens when a component triggers a re-render in a way that continuously updates the state. For instance, if you call setCount inside the component's body without any condition, it could lead to infinite re-renders.
+function MyComponent() {
+  const [count, setCount] = useState(0);
+
+
+  // This triggers a re-render and becomes an infinite loop
+  setCount(count + 1);
+
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+    </div>
+  );
+}
+
+3) How to spot and avoid infinite loops:
+Spotting: Look for places where you're updating state unconditionally inside the component body.
+Avoiding: Ensure that state updates are conditionally triggered(conditional statement or event listener) or use useEffect for side effects to prevent unintentional infinite loops. UseEffect is used to mamange state if you want the state to change only once i.e. on mount therefore we don’t give it a dependency. If you give it a dependency then it will infinite loop.
+function MyComponent() {
+  const [count, setCount] = useState(0);
+
+
+  useEffect(() => {
+    // This triggers a re-render, but it won't cause an infinite loop
+    setCount(count + 1);
+  }, [count]); // useEffect will only run when 'count' changes
+
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+Real world example:
+
+So in this example I have a function that will call the stateFunction thus changing the state. 
+So we know that when a component loads (renders) it executes the codes in within its body. Since in this example I invoke the function(changeBG)  which invokes the stateFunction. This causes the component to re-render, which then calls the changeBg function again etc etc.
+
+const Content = ({ color }) => {
+  const changeBG = (newColor) => {
+    return setbackgroundColor(newColor);
+  };
+
+
+  changeBG(color);
+
+
+The re-render is caused by changeBG(color) being called directly in the component body. When changeBG(color) is invoked, it updates the backgroundColor state, triggering a re-render of the Content component. This re-render causes changeBG(color) to be invoked again, leading to an infinite loop.
+To fix this issue, you should avoid calling state-setting functions directly in the component body, especially without any condition. Instead, you might want to use useEffect to perform such actions:
+const Content = ({ backgroundColor, setbackgroundColor, color }) => {
+  useEffect(() => {
+    const changeBG = (newColor) => {
+      setbackgroundColor(newColor);
+    };
+
+
+    changeBG(color);
+  }, [color]);
+
+
+  // Rest of the component...
+}
+
+
+
+Now, changeBG(color) is executed within the useEffect hook, ensuring it only runs when color changes, preventing the infinite loop.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Lessons from projects:
+
+
+Basic portfolio app:
+
+1: When making react apps, the root component doesn't take up the whole height and width of the browser. To make it do so you must give it a min-height: 100vh and min-width: 100vw
+
+//
+
+2: When working with images in a React app, you import them into your components and use them as JSX elements. e.g:
+import profileImage from "./profile.jpg"; 
+<img src={profileImage} alt="Profile" />
+
+//
+
+3: When you use target="_blank" to open links in a new tab or window, it's generally a good practice to include rel="noopener noreferrer" for security and privacy reasons. This is especially important when linking to external websites.
+
+//
+
+4: Nested paths - the child paths must have an absoulte path i.e. you must inclde the parent route as a prefix to the child path 
+e.g. <Route path="/ProjectGallery" element={<ProjectGallery />}>
+          <Route
+            path="/ProjectGallery/Project/:id"
+            element={<Project projectsObject={projects} />}
+          />
+        </Route>
+
+// 
+
+5: inside the parent route component you learnt that we can use shorthand url in the navlink i.e.  to='project/SunnySolar' 
+However as you may find that this can lead to problems and the routes doesnt work. If you run into this then use absoulte in the navlink to.
+It's often a good practice to use absolute paths when navigating between nested routes to avoid any potential issues.
+
+//
+
+6. useParams 'id' can be very useful because I can create an object of objects and give the keys the names of the endpoint. Then I can use id to access the objects. This is very useful for when you have 1 component and want it to have he same features but different content (i.e. products page with fixed price, image and details section but want the values to change).
+We then use refer to that object via square notation e.g. products[id]
+
+for example: 
+const myProjects = {
+    TeamCardGenerator: {
+      title: "Team Card Generator",
+      deployedLink: "https://example.com/teamcardgenerator",
+      
+    },
+    SunnySolar: {
+      title: "Sunny Solar",
+      deployedLink: "https://example.com/sunnysolar",
+    
+    },
+    Weatherapp: {
+      title: "Weather App",
+      deployedLink: "https://example.com/weatherapp",
+    }}
+
+     myProjects[id]  -- This will then give you access to that specifc id key. 
+    Then use destructuting to make use of the values i.e. const [title, deployedlink] = myProjects[ID]
+
+    FOR THIS TO WORK YOU MUST MAKE SURE THE ENDPOINT IN THE 'PATH' AND 'TO' ARE IDENTICAL TO THE KEY'S IN THE OBJECT OF OBJECTS.
+
+
+    // 
+
+    7: Step 5 and 6 showed you how to do such thing when you are dealing with small data and you have written in in the app.jsx. However most often than note I will be dealong with large data e.g. imagine im making and ecommerce app. that will have 50 products. I can't go product by product like I did in the step 5/6. (I cant manaully write all the navlinks etc..) therefore we store our data in a json file. 
+
+
+
+
+
+
+
+
+
+To do app:
+
+In this app I want it so that when the user types into the input field and clicks submit. I take that information and display it onto a different component. So essentially I want to take data from one component and use it in another component even though they are not direct siblings of each other.
+
+
+To achieve this Im must use useState. I will pass the state function wrapped in another function as a prop to component 1. This function will take a parameter e.g. 
+
+const [formData, setFormData] = useState("");
+
+
+  const formResult = (value) => {
+    setFormData(value);
+  };
+
+
+  return (
+      <SearchBar formResult={formResult} />
+   
+
+Next, in component 1 I will execute a function that will invoke this ‘fromResult’ function and pass it a value. This in turn will cause the ‘fromData’ state to change.
+Within component 1, we will the function prop passed from the app.jsx and we invoke it (i.e. by a button click of the submit button) and here we will pass the argument of the input text value.
+Next I will pass ‘fromData’ as a prop to the component 2, there I will display the formData.
+
+
+E.g. full code:
+
+// APP.jsx  
+
+const [formData, setFormData] = useState("");
+
+
+  const formResult = (value) => {
+    setFormData(value);
+  };
+
+
+  return (
+    <div className="appDiv">
+      <SearchBar formResult={formResult} />
+      <main>
+        <TaskList formData={formData} />
+
+
+
+ 	// Component 1
+
+
+const SearchBar = ({ formResult }) => {
+  const [search, setsearch] = useState("");
+  const handleChange = (e) => {
+    setsearch(e.target.value);
+  };
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    formResult(search);
+    setsearch("");
+  };
+
+^ In component 1 - we are using useState to set the state as the input value. We are calling the formResult() with the input value as the argument - this in turn will change the state of the formData to the input value. We can then use the input value and display it on another component.
+
+
+Summary: in order to use data from one component in another component (that are not siblings) then you combine a function with useState to extract that information and pass it to the intended target component. You must define the function and useState in app,jsx - I will then take the function that contains the state function and pass it to comp1 and pass the state variable to component 2. Therefore calling the function with the value from comp1 will in turn change the state in comp 2.
+
+
+
+
+
+
+
+
+
+
+
+
+- Before writing any code you need to PLAN each component and the state flow. Becuase you don't want to code and then realise halfway trhough that your code base is too complex and all over the place.
+
+
+---So in order to do this you need to write the basics of each component and what they entail (Dont add functionality) once that is done you will know what data needs to be accessed by which components and then you can start adding functionality.
+
+
+--- You have to also be aware of how you will render this data. i.e. if you want things to update and list out then you'd need to have the list as a state on the app.jsx.
+likewise if you if you intend to add CRUD you'll have to update that list somehow by calling a function to remove or add the data based on the info from other componenets.
+
+
+
+
+-- So in summary, majority of your state and handling would be written in root component along with functions that control those states. Then you can pass the state varaible and functions across different components
+
+
+
+
+
+
+1)  The logic of this app is that the user will have a task, status and tags selected.
+ so we create a state vraiable that will hold these tasks so that we can map over them 
+to display on the correct section.
+
+This is how we deal with tag selection (whereby the user clicks a tag and it appears on the task card)
+So first thing first, what is the logic we're trying to do? - we're trying to say if the tags array in the state varibale
+contains the selected tag we want to remove that tag from selection and if its not selected already we want to add it.
+
+ const selectTag = (tag) => {
+	if (Statevariable.tags.some( item => return item === tag) {
+	let filteredTags = statevraiable.tags.filter( item => item !== tag)
+	setStateVariable(...Statevariable, tags: filteredTags 
+} else {setStateVariable(...StateVariable, [...statevariable.tags, tag]}
+
+What is this code saying: Its checking to see if the tags array contains an instance of 'tag' which is a paramter passed when the user clicks
+on the tag button. If the Array already has that then we filtering out that tag to remove it from the tags array so we use filtermethod 
+to only return the tags names that are not === tag.
+we then change the 'tags' key to filteredTags i.e replacing the old array with the updated array
+
+
+Else -- i.e. if the tag is not present in the tags array then we want to spread the tags array and add the newly selected tag
+if we did ...Statevariable, tags: tag  -- this would overwrite the entire tags key and place the only 1 tag - therefore you'll only end up
+with 1 tag in the array at all times and this is incorrect.
+
+
+Take aways: 
+
+- How to find if something exists in an array and how to deal with it if it does
+- How to spread an array that is an object property. 
+
+
+------------------------------------------------------
+
+
+2) When you pass a function with an argument as a prop, your basically passing the returned value of that function
+
+e.g. const isClicked = const isChecked = (tag) => {
+  return myObject.tags.some(item => item === tag)
+};
+
+
+<Tag selected={ isClicked('html') />      -- This is calling the isClicked function with 'html' as argument 
+so its returning true or false (becasue of the some() method). we can the use this value in the child component.
+
+if we were to pass it as selected ={isClicked} we would then have to manually add that arguement in ourselve inside the child compoenent
+
+
+3) When doing map() you can also use conditional rendering i.e. Array.map((value  => { return Array.status === ‘active’ && <Component 1 />)  
